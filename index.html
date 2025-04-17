@@ -7,7 +7,7 @@
 <meta content="width=device-width, initial-scale=1.0, user-scalable=no" name="viewport"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js">
 // Splash screen auto-hide
-window.addEventListener('load', function () {
+document.addEventListener('DomContentLoaded', function () {
   if (!localStorage.getItem('pivData')) {
   setTimeout(function () {
     const splash = document.getElementById('splashScreen');

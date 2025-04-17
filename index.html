@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <title>PIV Inspection</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
-    body {
+    html, body {
       margin: 0;
       padding: 0;
+      overflow: hidden;
       background-image: url('5E52CBCA-B358-4884-93B1-E397CBFD04BF.png');
       background-color: black;
       background-repeat: no-repeat;
@@ -17,17 +18,19 @@
       background-size: cover;
       color: white;
       font-family: Arial, sans-serif;
-      height: 100%;
-      width: 100%;
-      min-height: 100vh;
+      height: 100vh;
+      width: 100vw;
+      touch-action: none;
     }
 
     .top-right-buttons {
       position: fixed;
-      top: 15px;
-      right: 15px;
+      top: 10px;
+      right: 10px;
       display: flex;
-      gap: 10px;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
       z-index: 1001;
     }
 
@@ -39,7 +42,17 @@
       color: white;
     }
 
-    .icon-btn.eraser { color: pink; }
+    .icon-btn.eraser {
+      color: pink;
+    }
+
+    .icon-label {
+      font-size: 10px;
+      color: white;
+      text-align: center;
+      margin-top: -6px;
+      max-width: 60px;
+    }
 
     .screen {
       display: flex;
@@ -79,14 +92,22 @@
       max-width: 200px;
     }
 
-    .green { background-color: #28a745; color: white; }
-    .blue { background-color: #007bff; color: white; }
+    .green {
+      background-color: #28a745;
+      color: white;
+    }
+
+    .blue {
+      background-color: #007bff;
+      color: white;
+    }
 
     #modal {
       position: absolute;
-      top: 0; left: 0;
+      top: 0;
+      left: 0;
       height: 100vh;
-      width: 100%;
+      width: 100vw;
       background-color: rgba(0, 0, 0, 0.7);
       display: none;
       justify-content: center;
@@ -96,14 +117,18 @@
       z-index: 1000;
     }
 
-    #modal.active { display: flex; }
+    #modal.active {
+      display: flex;
+    }
 
     .question-text {
       font-size: 1.4em;
       margin-bottom: 30px;
     }
 
-    .hidden { display: none; }
+    .hidden {
+      display: none;
+    }
 
     #confirmModal {
       position: fixed;
@@ -138,9 +163,18 @@
 <body>
 
 <div class="top-right-buttons">
-  <button id="resumeBtn" class="icon-btn" title="Resume">&#128336;</button>
-  <button id="saveBtn" class="icon-btn" title="Save">&#128190;</button>
-  <button class="icon-btn eraser" title="Clear" onclick="clearAll()">&#9003;</button>
+  <div>
+    <button id="resumeBtn" class="icon-btn" title="Resume">&#128336;</button>
+    <div class="icon-label">Load Previous</div>
+  </div>
+  <div>
+    <button id="saveBtn" class="icon-btn" title="Save">&#128190;</button>
+    <div class="icon-label">Save Session</div>
+  </div>
+  <div>
+    <button class="icon-btn eraser" title="Clear" onclick="clearAll()">&#9003;</button>
+    <div class="icon-label">Clear Session</div>
+  </div>
 </div>
 
 <div class="screen" id="entryScreen">
@@ -150,6 +184,7 @@
   <button class="blue small-button" onclick="startUnmarked()">Unmarked</button>
 </div>
 
+<!-- Modal & Confirmation Screens -->
 <div id="modal" class="hidden">
   <p style="font-size:1.4em;">Does PIV have an issue?</p>
   <button class="green" onclick="issueResponse(false)">No</button>

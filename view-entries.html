@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Completion Summary</title>
+  <style>
+    body {
+      background-color: black;
+      color: white;
+      font-family: Arial, sans-serif;
+      padding: 30px;
+      text-align: center;
+    }
+    h1 {
+      font-size: 2.2em;
+      margin-bottom: 20px;
+      text-decoration: underline;
+    }
+    .total-completion {
+      font-size: 1.8em;
+      margin-bottom: 30px;
+    }
+    .zone-stats {
+      text-align: left;
+      max-width: 600px;
+      margin: 0 auto;
+      font-size: 1.4em;
+    }
+    .zone-block {
+      margin-top: 30px;
+      font-size: 36px;
+    }
+    .zone-header {
+      text-decoration: underline;
+      margin-bottom: 5px;
+    }
+    .zone-progress {
+      margin-left: 10px;
+    }
+    .green {
+      color: #28a745;
+    }
+    .yellow {
+      color: #f8e825;
+    }
+    .white {
+      color: white;
+    }
+    .back-btn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background-color: #28a745;
+      color: white;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      font-size: 24px;
+      line-height: 36px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .recent-entries-box {
+      margin-top: 70px;
+      padding: 10px;
+      border: 1px solid white;
+      max-width: 90%;
+      font-size: 1.3em;
+      text-align: left;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.8em;
+      min-height: 7em;
+    }
+  </style>
+</head>
+<body>
+<a href="index.html" class="back-btn">&#8592;</a>
+<h1>Completion Summary</h1>
+<div class="total-completion" id="totalCompletion"></div>
+<div class="zone-stats" id="zoneStats"></div>
+<div class="recent-entries-box" id="recentEntries"></div>
+
+<script>
+async function generateSummary() {
+  const entries = JSON.parse(localStorage.getItem("pivData") || "[]");
+
+  // Fetch the zone map
+  const zoneMap = await fetch("piv_zones.json").then(res => res.json());
+
+  const expectedZones = {};
+  Object.values(zoneMap).forEach(zone => {
+    if (!expectedZones[zone]) expectedZones[zone] = 0;
+    expectedZones[zone]++;
+  });
+
+  const seenPIVs = new Set();
+  const completedZones = {};
+  let totalUnique = 0;
+  let unmarkedCount = 0;
+
+  entries.forEach(entry => {
+    const piv = entry[0];
+    if (piv === "PIV-000") {
+      unmarkedCount++;
+      totalUnique++;
+    } else if (!seenPIVs.has(piv)) {
+      seenPIVs.add(piv);
+      const zone = zoneMap[piv];
+      if (!completedZones[zone]) completedZones[zone] = 0;
+      completedZones[zone]++;
+      totalUnique++;
+    }
+  });
+
+  const totalExpected = Object.values(expectedZones).reduce((a, b) => a + b, 0);
+  const totalPercent = Math.round((totalUnique / totalExpected) * 100);
+  const totalColor = totalPercent >= 90 ? "green" : totalPercent >= 70 ? "yellow" : "white";
+
+  document.getElementById("totalCompletion").innerHTML =
+    `<span class="${totalColor}">Total Entries: ${totalUnique}/${totalExpected} (${totalPercent}% complete)</span>`;
+
+  const zoneStats = document.getElementById("zoneStats");
+  zoneStats.innerHTML = "";
+
+  Object.keys(expectedZones).sort().forEach(zone => {
+    const complete = completedZones[zone] || 0;
+    const expected = expectedZones[zone];
+    const percent = Math.round((complete / expected) * 100);
+    const colorClass = percent >= 90 ? "green" : percent >= 70 ? "yellow" : "white";
+    zoneStats.innerHTML += `
+      <div class="zone-block ${colorClass}">
+        <div class="zone-header">${zone}:</div>
+        <div class="zone-progress">${complete}/${expected} (${percent}% complete)</div>
+      </div>`;
+  });
+
+  showRecentEntries(entries);
+}
+
+function showRecentEntries(entries) {
+  const seen = new Set();
+  const recent = [];
+
+  for (let i = entries.length - 1; i >= 0 && recent.length < 6; i--) {
+    const piv = entries[i][0];
+    if (piv !== "PIV-000" && !seen.has(piv)) {
+      seen.add(piv);
+      recent.push(piv.replace("PIV-", ""));
+    }
+  }
+
+  if (recent.length) {
+    document.getElementById("recentEntries").innerHTML = `<strong>Last Entries:</strong><br>${recent.join("<br>")}`;
+  }
+}
+
+generateSummary();
+</script>
+<p style="text-align: left; margin-top: 30px; font-size: 3.0em; color: green;">
+  Return to this page anytime to track progress.
+<p style="text-align: left; margin-top: 30px; font-size: 3.0em; color: green;">
+  Unmarked PIV's count toward TOTAL % but NOT toward Zone %
+</p>
+</body>
+</html>

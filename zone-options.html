@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Organize and Print</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+<script>
+(async function () {
+  const { jsPDF } = window.jspdf;
+
+  const zoneMap = await fetch('piv_zones.json')
+    .then(res => res.json())
+    .catch(() => ({}));
+
+  const entries = JSON.parse(localStorage.getItem("pivData") || "[]");
+
+  const zoneBuckets = {};
+  const unmarkedEntries = [];
+
+  entries.forEach(entry => {
+    const pivId = entry[0];
+    if (pivId === "PIV-000") {
+      unmarkedEntries.push(entry);
+    } else {
+      const zone = zoneMap[pivId] || "Unknown Zone";
+      if (!zoneBuckets[zone]) zoneBuckets[zone] = [];
+      zoneBuckets[zone].push(entry);
+    }
+  });
+
+  Object.values(zoneBuckets).forEach(list => {
+    list.sort((a, b) => {
+      const numA = parseInt(a[0].split("-")[1]);
+      const numB = parseInt(b[0].split("-")[1]);
+      return numA - numB;
+    });
+  });
+
+  const doc = new jsPDF({ orientation: "landscape" });
+  const headers = ["PIV", "Pos", "Sight", "Placard", "Corros", "ID Vis", "Chain", "Leaks", "Wrench", "Comments"];
+  const rowHeight = 10;
+  const colWidth = 25;
+  const marginX = 10;
+  const marginY = 20;
+  const perPage = 20;
+
+  let pageIndex = 0;
+  const zones = Object.keys(zoneBuckets).sort();
+
+  zones.forEach(zone => {
+    const list = zoneBuckets[zone];
+    const pages = Math.ceil(list.length / perPage);
+    for (let p = 0; p < pages; p++) {
+      if (pageIndex > 0) doc.addPage();
+      doc.setFontSize(12);
+      doc.text(`Zone: ${zone}`, marginX, 12);
+      headers.forEach((h, i) => doc.text(h, marginX + i * colWidth, marginY));
+      for (let r = 0; r < perPage; r++) {
+        const entry = list[p * perPage + r];
+        if (!entry) break;
+        const y = marginY + rowHeight * (r + 1);
+        entry.forEach((val, i) => {
+          doc.text(val, marginX + i * colWidth, y);
+        });
+      }
+      pageIndex++;
+    }
+  });
+
+  if (unmarkedEntries.length) {
+    doc.addPage();
+    doc.setFontSize(12);
+    doc.text("Unmarked PIVs", marginX, 12);
+    headers.forEach((h, i) => doc.text(h, marginX + i * colWidth, marginY));
+    for (let r = 0; r < unmarkedEntries.length; r++) {
+      const entry = unmarkedEntries[r];
+      const y = marginY + rowHeight * (r + 1);
+      entry.forEach((val, i) => {
+        doc.text(val, marginX + i * colWidth, y);
+      });
+    }
+  }
+
+  if (typeof doc.save === "function") {
+  doc.save("Organized_PIV_Inspection.pdf");
+  localStorage.removeItem("pivData");
+} else {
+  alert("This browser doesn't support direct PDF viewing. Please use Chrome or install a PDF viewer.");
+}
+})();
+</script>
+</body>
+</html>

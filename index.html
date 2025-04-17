@@ -28,10 +28,16 @@
       top: 10px;
       right: 10px;
       display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 18px;
+      z-index: 1001;
+    }
+
+    .icon-column {
+      display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 8px;
-      z-index: 1001;
     }
 
     .icon-btn {
@@ -52,111 +58,6 @@
       text-align: center;
       margin-top: -6px;
       max-width: 60px;
-    }
-
-    .screen {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      padding: 20px;
-      text-align: center;
-    }
-
-    input[type="number"],
-    input[type="text"] {
-      font-size: 24px;
-      padding: 8px;
-      width: 70%;
-      max-width: 210px;
-      margin-bottom: 20px;
-      text-align: center;
-    }
-
-    button {
-      font-size: 19px;
-      padding: 10px 16px;
-      margin: 10px;
-      width: 70%;
-      max-width: 240px;
-      border: none;
-      border-radius: 6px;
-    }
-
-    .small-button {
-      font-size: 18px;
-      padding: 8px 16px;
-      margin-top: 5px;
-      width: 60%;
-      max-width: 200px;
-    }
-
-    .green {
-      background-color: #28a745;
-      color: white;
-    }
-
-    .blue {
-      background-color: #007bff;
-      color: white;
-    }
-
-    #modal {
-      position: absolute;
-      top: 0;
-      left: 0;
-      height: 100vh;
-      width: 100vw;
-      background-color: rgba(0, 0, 0, 0.7);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      text-align: center;
-      z-index: 1000;
-    }
-
-    #modal.active {
-      display: flex;
-    }
-
-    .question-text {
-      font-size: 1.4em;
-      margin-bottom: 30px;
-    }
-
-    .hidden {
-      display: none;
-    }
-
-    #confirmModal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      height: 100vh;
-      width: 100vw;
-      background: rgba(0, 0, 0, 0.9);
-      color: white;
-      display: none;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      z-index: 999;
-    }
-
-    #confirmModal p {
-      font-size: 1.4em;
-      margin-bottom: 20px;
-      padding: 0 20px;
-    }
-
-    .modal-box {
-      background: #111;
-      padding: 30px;
-      border-radius: 8px;
-      border: 1px solid white;
     }
   </style>
 </head>

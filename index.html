@@ -168,6 +168,22 @@
 </head>
 <body>
 
+<!-- Splash Screen -->
+<div id="splashScreen" style="
+  position: fixed;
+  z-index: 99999;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+">
+  <img src="Splash.GIF" alt="Loading..." style="max-width: 80%; max-height: 80%;">
+</div>
+
 <div class="top-right-buttons">
   <div class="icon-column">
     <button id="resumeBtn" class="icon-btn" title="Resume">&#128336;</button>
@@ -399,6 +415,16 @@
       window.location.reload();
     }
   }
+
+  // Splash screen hide after delay
+  window.addEventListener('load', function () {
+    setTimeout(function () {
+      const splash = document.getElementById('splashScreen');
+      splash.style.opacity = '0';
+      splash.style.transition = 'opacity 0.5s ease';
+      setTimeout(() => splash.style.display = 'none', 500);
+    }, 1800);
+  });
 </script>
 
 </body>

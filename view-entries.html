@@ -139,7 +139,7 @@
 
     function loadStats() {
       const savedData = JSON.parse(localStorage.getItem("pivData") || "[]");
-      fetch("zones.json").then(res => res.json()).then(zones => {
+      fetch("piv_zones.json").then(res => res.json()).then(zones => {
         const zoneCounts = {};
         const completed = new Set(savedData.map(e => e[0]));
         Object.entries(zones).forEach(([piv, zone]) => {
